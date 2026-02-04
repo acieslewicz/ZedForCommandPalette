@@ -9,10 +9,17 @@ using Microsoft.Data.Sqlite;
 
 namespace ZedCommandPalette.Components;
 
-internal class ZedProject(long workspaceId, List<string> paths, long? remoteConnectionId)
+internal abstract record RemoteConnection(string Kind)
+{
+    internal record Wsl(string? Distro, string? User) : RemoteConnection("wsl");
+
+    internal record Unknown(string Kind) : RemoteConnection(Kind);
+}
+
+internal class ZedProject(long workspaceId, List<string> paths, RemoteConnection? remoteConnection)
 {
     public long WorkspaceId { get; } = workspaceId;
-    public long? RemoteConnectionId { get; } = remoteConnectionId;
+    public RemoteConnection? RemoteConnection { get; } = remoteConnection;
     public List<string> Paths { get; } = paths;
 
     public string Name => Paths.Count switch
@@ -40,8 +47,9 @@ internal class ZedRecentProjects
 
         using var command = connection.CreateCommand();
         command.CommandText = """
-                                  SELECT workspace_id, paths, paths_order, remote_connection_id
-                                  FROM workspaces
+                                  SELECT w.workspace_id, w.paths, w.paths_order, rc.kind, rc.distro, rc.user
+                                  FROM workspaces w
+                                  LEFT JOIN remote_connections rc ON w.remote_connection_id = rc.id
                                   WHERE paths IS NOT NULL
                                   ORDER BY timestamp DESC
                               """;
@@ -51,20 +59,36 @@ internal class ZedRecentProjects
         var projects = new List<ZedProject>();
 
         while (reader.Read())
+        {
+            var paths = ParsePaths(
+                reader.IsDBNull(1) ? null : reader.GetString(1),
+                reader.IsDBNull(2) ? null : reader.GetString(2)
+            );
+            var remoteConnection = ParseRemoteConnection(
+                reader.IsDBNull(3) ? null : reader.GetString(3),
+                reader.IsDBNull(4) ? null : reader.GetString(4),
+                reader.IsDBNull(5) ? null : reader.GetString(5)
+            );
             projects.Add(new ZedProject(
                 reader.GetInt64(0),
-                ParsePaths(
-                    reader.IsDBNull(1) ? null : reader.GetString(1),
-                    reader.IsDBNull(2) ? null : reader.GetString(2)
-                ),
-                reader.IsDBNull(3) ? null : reader.GetInt64(3)
+                paths,
+                remoteConnection
             ));
+        }
 
         return projects;
     }
 
-    // TODO: Add a method that can get the Remote Connection from the database start with just Wsl
-    // Do an enum by connection type for Wsl and just get the nullable distro and user
+    private static RemoteConnection? ParseRemoteConnection(string? kind, string? distro, string? user)
+    {
+        if (kind is null) return null;
+
+        return kind switch
+        {
+            "wsl" => new RemoteConnection.Wsl(distro, user),
+            _ => new RemoteConnection.Unknown(kind)
+        };
+    }
 
     private static List<string> ParsePaths(string? rawPaths, string? rawOrder)
     {

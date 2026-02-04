@@ -23,10 +23,13 @@ internal sealed partial class OpenZedProjectCommand : InvokableCommand
     {
         if (_project.Paths.Count < 1)
             return CommandResult.Confirm(new ConfirmationArgs
-                { Title = "error", Description = "Project does not have any associated paths." });
-        if (_project.RemoteConnectionId is not null)
+                { Title = "Error", Description = "Project does not have any associated paths." });
+        if (_project.RemoteConnection is not null)
             return CommandResult.Confirm(new ConfirmationArgs
-                { Title = "error", Description = "Cannot currently open remote projects in Zed." });
+            {
+                Title = "Error",
+                Description = $"Cannot currently open {_project.RemoteConnection.Kind} projects in Zed."
+            });
 
         var args = string.Join(' ', _project.Paths.Select(p => $"\"{p}\""));
 
