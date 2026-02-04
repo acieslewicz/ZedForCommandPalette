@@ -24,14 +24,31 @@ internal sealed partial class OpenZedProjectCommand : InvokableCommand
         if (_project.Paths.Count < 1)
             return CommandResult.Confirm(new ConfirmationArgs
                 { Title = "Error", Description = "Project does not have any associated paths." });
-        if (_project.RemoteConnection is not null)
-            return CommandResult.Confirm(new ConfirmationArgs
-            {
-                Title = "Error",
-                Description = $"Cannot currently open {_project.RemoteConnection.Kind} projects in Zed."
-            });
 
         var args = string.Join(' ', _project.Paths.Select(p => $"\"{p}\""));
+
+        switch (_project.RemoteConnection)
+        {
+            case null:
+                break;
+            case RemoteConnection.Wsl wsl:
+                if (wsl.Distro is null)
+                    return CommandResult.Confirm(new ConfirmationArgs
+                    {
+                        Title = "Error",
+                        Description = "WSL Project is missing Distro."
+                    });
+
+                var target = wsl.User is not null ? $"{wsl.User}@{wsl.Distro}" : wsl.Distro;
+                args = $"--wsl {target} {args}";
+                break;
+            case var unknownConnection:
+                return CommandResult.Confirm(new ConfirmationArgs
+                {
+                    Title = "Error",
+                    Description = $"Cannot currently open {unknownConnection.Kind} projects."
+                });
+        }
 
         Process.Start(new ProcessStartInfo
         {
