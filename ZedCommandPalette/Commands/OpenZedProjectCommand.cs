@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using ZedCommandPalette.Components;
+using ZedCommandPalette.Helpers;
 
 namespace ZedCommandPalette.Commands;
 
@@ -52,9 +53,9 @@ internal sealed partial class OpenZedProjectCommand : InvokableCommand
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = "zed",
+            FileName = SettingsManager.Instance.ZedPath,
             Arguments = args,
-            UseShellExecute = true,
+            UseShellExecute = false,
             CreateNoWindow = true
         });
 
