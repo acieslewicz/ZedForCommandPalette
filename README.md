@@ -8,3 +8,6 @@ This project provides an unofficial PowerToys command palette extension for open
 
 The extension parses Zed's local sqlite database file to find information about the most recently used workspaces and provides a way to launch them through Zed.
 
+## Acknowledgments
+
+Inspired by [Visual Studio Code for Command Palette](https://github.com/tanchekwei/VisualStudioCodeForCommandPalette)
