@@ -36,9 +36,9 @@ internal sealed partial class ZedProjectsListPage : DynamicListPage
     {
         var projects = ZedRecentProjects.GetRecentProjects();
 
-        return projects.Where(p => p.Paths.Count > 0)
+        return projects
             .Where(p => string.IsNullOrEmpty(SearchText) ||
                         p.Paths.Any(path => path.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
-            .Select(p => new ListItem(new OpenZedProjectCommand(p)) { Icon = Icons.ZedIcon }).ToArray();
+            .Select(p => new ListItem(new OpenZedProjectCommand(p)) { Icon = Icons.ZedIcon, Title = p.Name }).ToArray();
     }
 }

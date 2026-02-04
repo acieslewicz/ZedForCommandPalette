@@ -16,7 +16,7 @@ internal sealed partial class OpenZedProjectCommand : InvokableCommand
     public OpenZedProjectCommand(ZedProject project)
     {
         _project = project;
-        Name = project.Name;
+        Name = "Open";
     }
 
     public override ICommandResult Invoke()
