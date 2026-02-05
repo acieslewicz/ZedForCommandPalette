@@ -42,6 +42,7 @@ jobs:
         dotnet build --configuration Release
         -p:GenerateAppxPackageOnBuild=true
         -p:Platform=${{ matrix.platform }}
+        -p:RuntimeIdentifier=win-${{ matrix.platform == 'ARM64' && 'arm64' || 'x64' }}
         -p:AppxPackageDir="../AppPackages/${{ matrix.platform }}/"
 
     - name: Upload MSIX artifact
