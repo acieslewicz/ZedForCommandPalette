@@ -11,12 +11,12 @@ namespace ZedCommandPalette.Components;
 
 internal abstract record RemoteConnection(string Kind)
 {
-    internal record Wsl(string? Distro, string? User) : RemoteConnection("wsl");
+    internal sealed record Wsl(string? Distro, string? User) : RemoteConnection("wsl");
 
-    internal record Unknown(string Kind) : RemoteConnection(Kind);
+    internal sealed record Unknown(string Kind) : RemoteConnection(Kind);
 }
 
-internal class ZedProject(long workspaceId, List<string> paths, RemoteConnection? remoteConnection)
+internal sealed class ZedProject(long workspaceId, List<string> paths, RemoteConnection? remoteConnection)
 {
     public long WorkspaceId { get; } = workspaceId;
     public RemoteConnection? RemoteConnection { get; } = remoteConnection;
@@ -29,7 +29,7 @@ internal class ZedProject(long workspaceId, List<string> paths, RemoteConnection
     };
 }
 
-internal class ZedRecentProjects
+internal sealed class ZedRecentProjects
 {
     internal static List<ZedProject> GetRecentProjects()
     {
