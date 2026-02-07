@@ -89,7 +89,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PublishSingleFile>true</PublishSingleFile>
+    <PublishSingleFile>false</PublishSingleFile>
     <IsAotCompatible>true</IsAotCompatible>
 
     <CsWinRTAotOptimizerEnabled>true</CsWinRTAotOptimizerEnabled>
