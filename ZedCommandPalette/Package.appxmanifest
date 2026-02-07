@@ -9,11 +9,9 @@
   IgnorableNamespaces="uap uap3 rescap">
 
   <Identity
-    Name="ZedCommandPalette"
-    Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+    Name="acieslewicz.ZedCommandPalette"
+    Publisher="CN=Alexander Cieslewicz, O=Alexander Cieslewicz, L=Morrison, S=Colorado, C=US"
     Version="0.0.1.0" />
-  <!-- When you're ready to publish your extension, you'll need to change the
-       Publisher= to match your own identity -->
 
   <Properties>
     <DisplayName>Zed for Command Palette</DisplayName>
