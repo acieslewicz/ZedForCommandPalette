@@ -16,6 +16,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
     
     steps:
     - name: Checkout code
@@ -80,3 +82,26 @@ jobs:
       with:
         name: ${{ env.EXTENSION_NAME }}-${{ matrix.platform }}-v${{ steps.version.outputs.VERSION }}-installer
         path: AppPackages/${{ matrix.platform }}/**/*.msix
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+      steps:
+        - name: Download signed MSIX artifacts
+          uses: actions/download-artifact@v7
+
+        - name: Create Github Release
+          uses: softprops/action-gh-release@v2
+          with:
+            tag_name: v${{ needs.build.outputs.version }}
+            name: "${{ env.DISPLAY_NAME }} v${ needs.build.outputs.version }}"
+            generate_release_nots: true
+            files: **/*.msix
+            draft: false
+            prerelease: false
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
