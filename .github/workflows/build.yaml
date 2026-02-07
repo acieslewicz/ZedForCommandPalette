@@ -61,7 +61,7 @@ jobs:
         endpoint: https://cus.codesigning.azure.net/
         signing-account-name: code-sign-alexander
         certificate-profile-name: codesign-release
-        files-folder: ${{ github.workspace }}/AppPackages/${{ matrix.platform }}/"
+        files-folder: AppPackages/${{ matrix.platform }}
         files-folder-filter: msix
         files-folder-recurse: true
         exclude-environment-credential: true
