@@ -9,7 +9,7 @@
   IgnorableNamespaces="uap uap3 rescap">
 
   <Identity
-    Name="acieslewicz.ZedCommandPalette"
+    Name="ZedCommandPalette"
     Publisher="CN=Alexander Cieslewicz, O=Alexander Cieslewicz, L=Morrison, S=Colorado, C=US"
     Version="0.0.1.0" />
 
