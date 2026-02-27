@@ -13,9 +13,23 @@ using ZedCommandPalette.Components;
 
 namespace ZedCommandPalette.Pages;
 
+internal sealed partial class ZedProjectListItem : ListItem
+{
+    public ZedProject Project { get; }
+
+    public ZedProjectListItem(ZedProject project) : base(new OpenZedProjectCommand(project))
+    {
+        Project = project;
+        Icon = Icons.ZedIcon;
+        Title = project.Name;
+        Subtitle = project.Paths.FirstOrDefault() ?? "";
+        Tags = project.RemoteConnection is not null ? [new Tag { Text = project.RemoteConnection.Kind }] : [];
+    }
+}
+
 internal sealed partial class ZedProjectsListPage : DynamicListPage, INotifyItemsChanged
 {
-    private List<(ZedProject Project, ListItem Item)> _projectItems = [];
+    private List<ZedProjectListItem> _projectItems = [];
 
     public ZedProjectsListPage()
     {
@@ -51,23 +65,17 @@ internal sealed partial class ZedProjectsListPage : DynamicListPage, INotifyItem
     {
         return _projectItems
             .Where(entry => string.IsNullOrEmpty(SearchText) ||
-                            entry.Project.Paths.Any(path =>
-                                path.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
-            .Select(entry => entry.Item)
+                            entry.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
             .ToArray<IListItem>();
     }
 
     private void LoadProjects()
     {
         _projectItems = ZedRecentProjects.GetRecentProjects()
-            .Select(p => (p, new ListItem(new OpenZedProjectCommand(p))
+            .Select(p => new ZedProjectListItem(p)
             {
-                Icon = Icons.ZedIcon,
-                Title = p.Name,
-                Subtitle = p.Paths.FirstOrDefault() ?? "",
-                Tags = p.RemoteConnection is not null ? [new Tag { Text = p.RemoteConnection.Kind }] : [],
                 MoreCommands = [new CommandContextItem(new RefreshCommand(LoadProjects))]
-            })).ToList();
+            }).ToList();
 
         RaiseItemsChanged();
     }
