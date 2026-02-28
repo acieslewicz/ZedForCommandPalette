@@ -13,6 +13,8 @@ internal abstract record RemoteConnection(string Kind)
 {
     internal sealed record Wsl(string? Distro, string? User) : RemoteConnection("wsl");
 
+    internal sealed record Ssh(string? Host, int? Port, string? User) : RemoteConnection("ssh");
+
     internal sealed record Unknown(string Kind) : RemoteConnection(Kind);
 }
 
@@ -41,7 +43,7 @@ internal sealed class ZedRecentProjects
 
         using var command = connection.CreateCommand();
         command.CommandText = """
-                                  SELECT w.workspace_id, w.paths, w.paths_order, rc.kind, rc.distro, rc.user
+                                  SELECT w.workspace_id, w.paths, w.paths_order, rc.kind, rc.host, rc.port, rc.distro, rc.user
                                   FROM workspaces w
                                   LEFT JOIN remote_connections rc ON w.remote_connection_id = rc.id
                                   WHERE w.paths IS NOT NULL AND w.paths != ''
@@ -61,7 +63,9 @@ internal sealed class ZedRecentProjects
             var remoteConnection = ParseRemoteConnection(
                 reader.IsDBNull(3) ? null : reader.GetString(3),
                 reader.IsDBNull(4) ? null : reader.GetString(4),
-                reader.IsDBNull(5) ? null : reader.GetString(5)
+                reader.IsDBNull(5) ? null : reader.GetInt32(5),
+                reader.IsDBNull(6) ? null : reader.GetString(6),
+                reader.IsDBNull(7) ? null : reader.GetString(7)
             );
             projects.Add(new ZedProject(
                 reader.GetInt64(0),
@@ -73,12 +77,13 @@ internal sealed class ZedRecentProjects
         return projects;
     }
 
-    private static RemoteConnection? ParseRemoteConnection(string? kind, string? distro, string? user)
+    private static RemoteConnection? ParseRemoteConnection(string? kind, string? host, int? port, string? distro, string? user)
     {
         if (kind is null) return null;
 
         return kind switch
         {
+            "ssh" => new RemoteConnection.Ssh(host, port, user),
             "wsl" => new RemoteConnection.Wsl(distro, user),
             _ => new RemoteConnection.Unknown(kind)
         };

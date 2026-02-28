@@ -28,17 +28,30 @@ internal sealed partial class OpenZedProjectCommand : InvokableCommand
         {
             case null:
                 break;
+            case RemoteConnection.Ssh ssh:
+                {
+                    if (ssh.Host is null)
+                        return CommandResult.Confirm(new ConfirmationArgs
+                        { Title = "Error", Description = "SSH Project is missing Host." });
+                    var user = ssh.User is not null ? $"{ssh.User}@" : "";
+                    var port = ssh.Port is not null ? $":{ssh.Port}" : "";
+                    var target = $"ssh://{user}{ssh.Host}{port}";
+                    args = string.Join(' ', _project.Paths.Select(p => $"\"{target}/{p}\""));
+                    break;
+                }
             case RemoteConnection.Wsl wsl:
-                if (wsl.Distro is null)
-                    return CommandResult.Confirm(new ConfirmationArgs
-                    {
-                        Title = "Error",
-                        Description = "WSL Project is missing Distro."
-                    });
+                {
+                    if (wsl.Distro is null)
+                        return CommandResult.Confirm(new ConfirmationArgs
+                        {
+                            Title = "Error",
+                            Description = "WSL Project is missing Distro."
+                        });
 
-                var target = wsl.User is not null ? $"{wsl.User}@{wsl.Distro}" : wsl.Distro;
-                args = $"--wsl {target} {args}";
-                break;
+                    var target = wsl.User is not null ? $"{wsl.User}@{wsl.Distro}" : wsl.Distro;
+                    args = $"--wsl {target} {args}";
+                    break;
+                }
             case var unknownConnection:
                 return CommandResult.Confirm(new ConfirmationArgs
                 {
