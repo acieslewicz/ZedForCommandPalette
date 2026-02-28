@@ -1,4 +1,4 @@
-name: ZedCommandPalette Release Builder
+name: ZedWorkspacesForCommandPalette Release Builder
 
 on:
   workflow_dispatch:

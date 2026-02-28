@@ -1,4 +1,4 @@
-# Zed for Command Palette
+# Zed Workspaces for Command Palette
 
 ## Overview
 
@@ -11,3 +11,4 @@ The extension parses Zed's local sqlite database file to find information about 
 ## Acknowledgments
 
 Inspired by [Visual Studio Code for Command Palette](https://github.com/tanchekwei/VisualStudioCodeForCommandPalette)
+

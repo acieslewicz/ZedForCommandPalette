@@ -15,7 +15,7 @@ public partial class ZedCommandPaletteCommandsProvider : CommandProvider
 
     public ZedCommandPaletteCommandsProvider()
     {
-        DisplayName = "Zed for Command Palette";
+        DisplayName = "Zed Workspaces for Command Palette";
         Icon = Icons.ZedIcon;
         Settings = SettingsManager.Instance.Settings;
 
